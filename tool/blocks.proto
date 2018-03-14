@@ -1,0 +1,96 @@
+syntax = "proto2";
+
+//package blocks;
+//    protoc --java_out=./ blocks.proto
+
+option java_package = "edu.mit.blocks";
+//option java_package = "com.ardublock.core";
+option java_outer_classname = "BlocksProto"; 
+
+enum BlockKind{
+	command = 0;
+	data = 1;
+	function = 2;
+}
+
+message Description{
+	optional string text = 1 [default = " "];
+	repeated string argDescription = 2;
+}
+
+enum ConnectorKind{
+	socket = 0;
+	plug = 1;
+}
+
+enum Position{
+	single = 0;
+	mirror = 1;
+	bottom = 2;
+}
+message ConnectorArgDefault{
+	required string name = 1;
+	required string label = 2;
+}
+message Connector{
+	required ConnectorKind kind = 1;
+	required string type = 2;
+	optional string label = 3;			// bc.name.label
+	optional bool labelEditable = 4 [default = false];
+	optional bool isExpandable = 6 [default = false];
+	optional Position position = 5 [default = single];
+	optional ConnectorArgDefault arg = 7;
+}
+
+enum ImageLocation{
+	center = 0;
+	east = 1;
+	west = 2;
+	north = 3;
+	south = 4;
+	southeast = 5;
+	southwest = 6;
+	northeast = 7;
+	northwest = 8;
+}
+
+message Image{
+	optional bool wrapText = 1 [default = false];
+	optional bool imageEditable = 2 [default = false];
+	optional ImageLocation imageLocation = 3 [default = center];
+	optional int32 width = 4;
+	optional int32 height = 5;
+	required string fileLocation = 6;		// bi.name.image
+}
+
+message BlockArg{	
+	optional bool isStarter = 1 [default = false];
+	optional bool isTerminaor = 2 [default = false];
+	optional string labelPrefix = 3 [default = ""];
+	optional string labelSuffix = 4 [default = ""];
+	optional bool labelEditable=5 [default = false];
+	optional bool labelUnique = 6 [default = false];
+	optional bool labelIsValue = 7 [default = false];
+	optional bool labelPageEnable = 8 [default = false];
+}
+
+message Block{
+	required string name = 1;
+	optional BlockKind kind = 2 [default = command];
+	optional string color = 3 [default = "128 128 128"];
+	optional string label = 4 [default = ""];
+	optional BlockArg arg = 5;
+	optional Description description = 6;
+	repeated Connector connector = 7;
+	optional Image image = 8;
+}
+
+message Family{
+	required string refBlockName = 1;
+	repeated Block member= 2;
+}
+
+message Blocks{
+	repeated Block block= 1;
+	repeated family family= 2;
+}

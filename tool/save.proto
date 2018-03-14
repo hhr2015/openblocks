@@ -1,0 +1,97 @@
+syntax = "proto2";
+
+//package blocks;
+//    protoc --java_out=./ save.proto
+
+option java_package = "edu.mit.blocks";
+//option java_package = "com.ardublock.core";
+option java_outer_classname = "SaveProto"; 
+
+
+
+
+
+
+
+
+message PageBlocks{
+	repeated block blocks=1;
+}
+
+
+enum ConnectorKind{
+	plug = 0;
+	sockets = 1;
+}
+enum PositionType{
+	single = 0;
+	mirror = 1;
+	bottom = 2;
+}
+
+
+message BlockConnecter{
+	optional string label = 1;
+	optional ConnectorKind connectorKind = 2 [default = sockets];
+	optional string initType = 3;
+	optional int conBlockID = 4;
+	optional PositionType positionType = 5;
+	optional bool isExpandable = 6;
+
+}
+
+
+
+message BoxSize{
+	required int width = 1;
+	required int height = 2;
+}
+
+message Block{
+	required int id=1;
+	required string genusName=2;
+	optional bool hasFocus = 3 [ default = false];
+	optional string label = 4;
+	required Location location = 5;
+	optional int beforeBlockID = 7;
+	optional int afterBlockID = 8;
+	optional BlockConnecter plug = 9;
+	repeated BlockConnecter sockets = 10;
+
+
+	optional string pageLabel = 5;
+	optional string compilerErrorMsg = 6;
+	optional BoxSize boxSize = 7;
+}
+
+
+
+message Location{
+	required int x=1;
+	required int y=2;
+}
+
+message BlockLocation{
+	required int blockID=1;
+	required Location location=2;
+}
+
+message Comment{
+	required string text=1;
+	required Location location=2;
+}
+
+
+
+
+
+
+message Page{
+	repeated PageBlocks pageBlocks=1;
+}
+
+
+message Pages{
+	repeated Page page=1;
+}
+
