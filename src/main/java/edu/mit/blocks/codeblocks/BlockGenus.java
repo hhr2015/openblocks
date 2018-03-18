@@ -25,6 +25,7 @@ import edu.mit.blocks.renderable.BlockImageIcon;
 import edu.mit.blocks.renderable.BlockImageIcon.ImageLocation;
 import edu.mit.blocks.workspace.Workspace;
 import edu.mit.blocks.workspace.WorkspaceEnvironment;
+import edu.mit.custom.Utils;
 
 /**
  * A genus describes the properties that define a block.  For example, fd is a block genus
@@ -45,16 +46,16 @@ public class BlockGenus {
     private String labelSuffix = EMPTY_STRING;
     private String blockDescription;
 
-    private boolean isStarter;
-    private boolean isTerminator;
-    private boolean isLabelEditable;
-    private boolean labelMustBeUnique;
-    private boolean isLabelValue;
-    private boolean isPageLabelEnabled;
-    private boolean hasDefArgs;
-    private boolean areSocketsExpandable;
+    private boolean isStarter = false;
+    private boolean isTerminator = false;
+    private boolean isLabelEditable = false;
+    private boolean labelMustBeUnique = false;
+    private boolean isLabelValue = false;
+    private boolean isPageLabelEnabled = false;
+    private boolean hasDefArgs = false;
+    private boolean areSocketsExpandable = false;
     //is this genus an infix operater - checks if it has two bottom sockets
-    private boolean isInfix;
+    private boolean isInfix = false;
 
     //connector information
     private BlockConnector plug = null;
@@ -89,7 +90,7 @@ public class BlockGenus {
      * Only BlockGenus can create BlockGenus objects, specifically only the function that loads
      * BlockGenuses information from the loadString can create BlockGenuses objects
      */
-    private BlockGenus(WorkspaceEnvironment workspaceEnvironment) {
+    public BlockGenus(WorkspaceEnvironment workspaceEnvironment) {
         env = workspaceEnvironment;
     }
 
@@ -97,7 +98,7 @@ public class BlockGenus {
      * Constructs a BlockGenus copy with the specified genusName
      * @param genusName
      */
-    private BlockGenus(WorkspaceEnvironment workspaceEnvironment, String genusName, String newGenusName) {
+    public BlockGenus(WorkspaceEnvironment workspaceEnvironment, String genusName, String newGenusName) {
 
         env = workspaceEnvironment;
 
@@ -105,7 +106,7 @@ public class BlockGenus {
 
         BlockGenus genusToCopy = env.getGenusWithName(genusName);
 
-        this.genusName = newGenusName;
+        this.setGenusName(newGenusName);
         this.areSocketsExpandable = genusToCopy.areSocketsExpandable;
         this.color = new Color(genusToCopy.color.getRed(), genusToCopy.color.getGreen(), genusToCopy.color.getBlue());
         this.familyList = new ArrayList<String>(genusToCopy.familyList);
@@ -473,7 +474,7 @@ public class BlockGenus {
 	 * */
     private static void loadGenusDescription(NodeList descriptions, BlockGenus genus, String attribName) {
         Node description;        
-		ResourceBundle bundle = ResourceBundle.getBundle("com/ardublock/block/ardublock");	
+		ResourceBundle bundle = Utils.getLangResourceBundle();	
 		for (int k = 0; k < descriptions.getLength(); k++) {
 			description = descriptions.item(k);	
 			if (description.getNodeName().equals("text") && !attribName.equals(null)) {
@@ -601,7 +602,7 @@ public class BlockGenus {
                     genus.sockets.add(socket);
                 } else {
                     genus.plug = socket;
-                    assert (!socket.isExpandable()) : genus.genusName + " can not have an expandable plug.  Every block has at most one plug.";
+                    assert (!socket.isExpandable()) : genus.getGenusName() + " can not have an expandable plug.  Every block has at most one plug.";
                 }
                 if (socket.isExpandable()) {
                     genus.areSocketsExpandable = true;
@@ -749,7 +750,7 @@ public class BlockGenus {
                         //this stub for this genus deviates from generic stub
                         //generate genus by copying one of generic ones
 
-                        BlockGenus newStubGenus = new BlockGenus(genus.env, stubGenus, stubGenus + genus.genusName);
+                        BlockGenus newStubGenus = new BlockGenus(genus.env, stubGenus, stubGenus + genus.getGenusName());
                         //load unique stub genus properties
                         NodeList stubChildren = stub.getChildNodes();
                         for (int n = 0; n < stubChildren.getLength(); n++) {
@@ -759,7 +760,7 @@ public class BlockGenus {
                             }
                         }
                         genus.env.addBlockGenus(newStubGenus);
-                        genus.stubList.add(newStubGenus.genusName);
+                        genus.stubList.add(newStubGenus.getGenusName());
                     } else {
                         //not a unique stub, add generic stub
                         genus.stubList.add(stubGenus);
@@ -793,10 +794,10 @@ public class BlockGenus {
                 //Attribute name to loadGenusDescription method
                 attribName = genusNode.getAttributes().getNamedItem("name").getNodeValue();
                 if (nameMatcher.find()) {
-                    newGenus.genusName = nameMatcher.group(1);
+                    newGenus.setGenusName(nameMatcher.group(1));
                 }
                 //assert that no other genus has this name
-                assert env.getGenusWithName(newGenus.genusName) == null : "Block genus names must be unique.  A block genus already exists with this name: " + newGenus.genusName;
+                assert env.getGenusWithName(newGenus.getGenusName()) == null : "Block genus names must be unique.  A block genus already exists with this name: " + newGenus.getGenusName();
                 nameMatcher = attrExtractor.matcher(genusNode.getAttributes().getNamedItem("color").toString());
                 if (nameMatcher.find()) { //will be true
                     col = new StringTokenizer(nameMatcher.group(1));
@@ -994,4 +995,147 @@ public class BlockGenus {
         return out.toString();
     }
 
+	public void setGenusName(String genusName) {
+		this.genusName = genusName;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
+	public String getKind() {
+		return kind;
+	}
+
+	public void setKind(String kind) {
+		this.kind = kind;
+	}
+
+	public String getInitLabel() {
+		return initLabel;
+	}
+
+	public void setInitLabel(String initLabel) {
+		this.initLabel = initLabel;
+	}
+
+	public boolean isStarter() {
+		return isStarter;
+	}
+
+	public void setStarter(boolean isStarter) {
+		this.isStarter = isStarter;
+	}
+
+	public boolean isTerminator() {
+		return isTerminator;
+	}
+
+	public void setTerminator(boolean isTerminator) {
+		this.isTerminator = isTerminator;
+	}
+
+	public void setLabelValue(boolean isLabelValue) {
+		this.isLabelValue = isLabelValue;
+	}
+
+	public void setLabelEditable(boolean isLabelEditable) {
+		this.isLabelEditable = isLabelEditable;
+	}
+
+	public boolean isLabelMustBeUnique() {
+		return labelMustBeUnique;
+	}
+
+	public void setLabelMustBeUnique(boolean labelMustBeUnique) {
+		this.labelMustBeUnique = labelMustBeUnique;
+	}
+
+	public boolean isPageLabelEnabled() {
+		return isPageLabelEnabled;
+	}
+
+	public void setPageLabelEnabled(boolean isPageLabelEnabled) {
+		this.isPageLabelEnabled = isPageLabelEnabled;
+	}
+
+	public void setLabelPrefix(String labelPrefix) {
+		this.labelPrefix = labelPrefix;
+	}
+
+	public void setLabelSuffix(String labelSuffix) {
+		this.labelSuffix = labelSuffix;
+	}
+
+	public void setBlockDescription(String blockDescription) {
+		this.blockDescription = blockDescription;
+	}
+
+	public List<String> getArgumentDescriptions() {
+		return argumentDescriptions;
+	}
+
+	public boolean isHasDefArgs() {
+		return hasDefArgs;
+	}
+
+	public void setHasDefArgs(boolean hasDefArgs) {
+		this.hasDefArgs = hasDefArgs;
+	}
+
+	public List<BlockConnector> getSockets() {
+		return sockets;
+	}
+
+	public void setSockets(List<BlockConnector> sockets) {
+		this.sockets = sockets;
+	}
+
+	public BlockConnector getPlug() {
+		return plug;
+	}
+
+	public void setPlug(BlockConnector plug) {
+		this.plug = plug;
+	}
+
+	public boolean isAreSocketsExpandable() {
+		return areSocketsExpandable;
+	}
+
+	public void setAreSocketsExpandable(boolean areSocketsExpandable) {
+		this.areSocketsExpandable = areSocketsExpandable;
+	}
+
+	public void setInfix(boolean isInfix) {
+		this.isInfix = isInfix;
+	}
+
+	public Map<ImageLocation, BlockImageIcon> getBlockImageMap() {
+		return blockImageMap;
+	}
+
+	public BlockConnector getBefore() {
+		return before;
+	}
+
+	public void setBefore(BlockConnector before) {
+		this.before = before;
+	}
+
+	public BlockConnector getAfter() {
+		return after;
+	}
+
+	public void setAfter(BlockConnector after) {
+		this.after = after;
+	}
+
+	public List<String> getFamilyList() {
+		return familyList;
+	}
+
+	public void setFamilyList(List<String> familyList) {
+		this.familyList = familyList;
+	}
 }

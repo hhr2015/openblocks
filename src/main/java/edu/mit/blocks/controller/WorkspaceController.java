@@ -53,19 +53,19 @@ import org.xml.sax.SAXException;
 import org.xml.sax.EntityResolver;
 
 import edu.mit.blocks.codeblocks.ProcedureOutputManager;	//*****
-
+import edu.mit.blocks.codeblocks.SocketRule;
+import edu.mit.blocks.codeblocks.StackRule;
 import edu.mit.blocks.codeblocks.BlockConnectorShape;
 import edu.mit.blocks.codeblocks.BlockGenus;
 import edu.mit.blocks.codeblocks.BlockLinkChecker;
 import edu.mit.blocks.codeblocks.CommandRule;
 import edu.mit.blocks.codeblocks.Constants;
-import edu.mit.blocks.codeblocks.SocketRule;
 import edu.mit.blocks.codeblocks.ParamRule;
 import edu.mit.blocks.codeblocks.PolyRule;
-import edu.mit.blocks.codeblocks.StackRule;
 import edu.mit.blocks.workspace.SearchBar;
 import edu.mit.blocks.workspace.SearchableContainer;
 import edu.mit.blocks.workspace.Workspace;
+import edu.mit.custom.Utils;
 
 /**
  * Example entry point to OpenBlock application creation.
@@ -86,7 +86,11 @@ public class WorkspaceController {
 
     //flag to indicate if a new lang definition file has been set
     private boolean langDefDirty = true;
-    // handle the case of loading the DTD from jar file. 
+    public void setLangDefDirty(boolean langDefDirty) {
+		this.langDefDirty = langDefDirty;
+	}
+
+	// handle the case of loading the DTD from jar file. 
     private InputStream langDefDtd;
     //flag to indicate if a workspace has been loaded/initialized 
     private boolean workspaceLoaded = false;
@@ -100,7 +104,7 @@ public class WorkspaceController {
     // I18N resource bundle
     private ResourceBundle langResourceBundle;
 	// List of styles
-    private List<String[]> styleList;
+    private List<String[]> styleList=null;
     
     private static ProcedureOutputManager pom;	//*****
     
@@ -271,15 +275,15 @@ public class WorkspaceController {
         }
     }
 
-    /**
+    /** TODO
      * Loads all the block genuses, properties, and link rules of
      * a language specified in the pre-defined language def file.
      * @param root Loads the language specified in the Element root
      */
     public void loadBlockLanguage(final Element root) {
-        /* MUST load shapes before genuses in order to initialize
-         connectors within each block correctly */
+        //MUST load shapes before genuses in order to initialize connectors within each block correctly
         BlockConnectorShape.loadBlockConnectorShapes(root);
+        //BlockConnectorShape.addDebugConnectionShapeMappings();
 
         //load genuses
         BlockGenus.loadBlockGenera(workspace, root);
@@ -410,14 +414,16 @@ public class WorkspaceController {
             resetWorkspace();
         }
         if (langDefDirty) {
-            loadBlockLanguage(langDefRoot);
+            //loadBlockLanguage(langDefRoot);					// importment
+        	Utils.loadBlockLanguage(workspace);// TODO 
+            langDefDirty = false;
         }
-        workspace.loadWorkspaceFrom(null, langDefRoot);
-        workspaceLoaded = true;
         
+        //loadProjectFromElement(null, langDefRoot);		// importment        
+        Utils.loadSetting(this,null);
     }
 
-    /**
+	/**
      * Loads the programming project from the specified file path.
      * This method assumes that a Language Definition File has already
      * been specified for this programming project.
@@ -440,8 +446,9 @@ public class WorkspaceController {
             //also load drawers, or any custom drawers from file.  if no custom drawers
             //are present in root, then the default set of drawers is loaded from
             //langDefRoot
-            workspace.loadWorkspaceFrom(projectRoot, langDefRoot);
+            loadProjectFromElement(projectRoot,langDefRoot);	// TODO
             workspaceLoaded = true;
+            
         } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
         } catch (SAXException e) {
@@ -453,15 +460,16 @@ public class WorkspaceController {
      * Loads the programming project from the specified element. This method
      * assumes that a Language Definition File has already been specified for
      * this programming project.
+     * @param root 
      *
      * @param element element of the programming project to load
      */
-    public void loadProjectFromElement(Element elementToLoad) {
-        workspace.loadWorkspaceFrom(elementToLoad, langDefRoot);
+    public void loadProjectFromElement(Element elementToLoad, Element root) {
+        workspace.loadWorkspaceFrom(elementToLoad, root);
         workspaceLoaded = true;
     }
 
-    /**
+    /** TODO
      * Loads the programming project specified in the projectContents String,
      * which is associated with the language definition file contained in the
      * specified langDefContents.  All the blocks contained in projectContents
@@ -495,12 +503,14 @@ public class WorkspaceController {
                 resetWorkspace();
             }
             if (langDefContents == null) {
-                loadBlockLanguage(langDefRoot);
+                loadBlockLanguage(langDefRoot);					// importment
+            	// TODO Utils.loadBlockLanguage(workspace, langResourceBundle);
             } else {
                 loadBlockLanguage(langRoot);
             }
-            workspace.loadWorkspaceFrom(projectRoot, langRoot);
-            workspaceLoaded = true;
+            loadProjectFromElement(projectRoot, langRoot);
+            //Utils.loadSetting(workspace);
+            //workspaceLoaded = true;
 
         } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
@@ -511,7 +521,11 @@ public class WorkspaceController {
         }
     }
 
-    /**
+    public void setWorkspaceLoaded(boolean workspaceLoaded) {
+		this.workspaceLoaded = workspaceLoaded;
+	}
+
+	/**
      * Resets the entire workspace.  This includes all blocks, pages, drawers, and trashed blocks.
      * Also resets the undo/redo stack.  The language (i.e. genuses and shapes) is not reset.
      */
@@ -568,14 +582,9 @@ public class WorkspaceController {
                 lastDirectory = selectedFile.getParentFile();
                 String selectedPath = selectedFile.getPath();
                 loadFreshWorkspace();
-                try
-                {
-                	loadProjectFromPath(selectedPath);
-                }
-                catch (IOException ee)
-                {
-                	throw new RuntimeException(ee);
-                }
+            	//loadProjectFromPath(selectedPath);
+            	Utils.loadProjectFromPath(workspace, selectedPath);
+            	workspaceLoaded = true;
             }
         }
     }
@@ -714,12 +723,12 @@ public class WorkspaceController {
     public static void main(final String[] args) {
         if (args.length < 1) {
             System.err.println("usage: WorkspaceController lang_def.xml");
-            System.exit(1);
+            //System.exit(1);
         }
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override public void run() {
                 final WorkspaceController wc = new WorkspaceController();
-                wc.setLangDefFilePath(args[0]);
+                //wc.setLangDefFilePath(args[0]);
                 wc.loadFreshWorkspace();
                 wc.createAndShowGUI();
             }

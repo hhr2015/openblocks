@@ -102,7 +102,7 @@ public class BlockConnectorShape {
     }
     
     
-    private void addDebugConnectionShapeMappings() {
+    public static void addDebugConnectionShapeMappings() {
         addConnenctionShapeMapping("number", 1);
         addConnenctionShapeMapping("number-list", 2);
         addConnenctionShapeMapping("number-inv", 3);

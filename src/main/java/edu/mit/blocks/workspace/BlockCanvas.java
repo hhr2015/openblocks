@@ -63,7 +63,7 @@ public class BlockCanvas implements PageChangeListener, ISupportMemento {
     /** The workspace in use */
     private final Workspace workspace;
     
-    private boolean collapsible = false;
+    private boolean collapsible = true;		// original default is false
 
     //////////////////////////////
     //Constructor/Destructor	//

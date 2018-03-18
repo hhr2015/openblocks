@@ -1,10 +1,8 @@
 syntax = "proto2";
 
-//package blocks;
-//    protoc --java_out=./ save.proto
+//	protoc --java_out=./ save.proto
 
-option java_package = "edu.mit.blocks";
-//option java_package = "com.ardublock.core";
+option java_package = "edu.mit.custom";
 option java_outer_classname = "SaveProto"; 
 
 
@@ -92,6 +90,7 @@ message Page{
 
 
 message Pages{
-	repeated Page page=1;
+	required int32 maxID = 1;
+	repeated Page page=2;
 }
 

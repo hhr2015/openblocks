@@ -1,65 +1,80 @@
 syntax = "proto2";
 
-//package blocks;
-//    protoc --java_out=./ blocks.proto
+//	protoc --java_out=./ blocks.proto
 
-option java_package = "edu.mit.blocks";
-//option java_package = "com.ardublock.core";
+option java_package = "edu.mit.custom";
 option java_outer_classname = "BlocksProto"; 
 
 enum BlockKind{
-	command = 0;
-	data = 1;
-	function = 2;
+	COMMAND = 0;
+	DATA = 1;
+	FUNCTION = 2;
 }
 
-message Description{
+message BlockDescription{
 	optional string text = 1 [default = " "];
 	repeated string argDescription = 2;
 }
 
 enum ConnectorKind{
-	socket = 0;
-	plug = 1;
+	SOCKET = 0;
+	PLUG = 1;
 }
 
-enum Position{
-	single = 0;
-	mirror = 1;
-	bottom = 2;
+enum ConnectorType{
+	NUMBER = 0;
+	NUMBERLIST = 1;
+	NUMBERINV = 2;
+	BOOLEAN = 3;
+	BOOLEANLIST = 4;
+	BOOLEANINV = 5;
+	STRING = 6;
+	STRINGLIST = 7;
+	STRINGINV = 8;
+	POLY = 9;
+	POLYLIST = 10;
+	POLYINV = 11;
+	PROCPARAM = 12;
+	CMD = 13;
+}
+
+enum ConnectorPosition{
+	SINGLE = 0;
+	MIRROR = 1;
+	BOTTOM = 2;
 }
 message ConnectorArgDefault{
-	required string name = 1;
-	required string label = 2;
+	required string defaultArgName = 1;
+	required string defaultArgLabel = 2;
 }
-message Connector{
-	required ConnectorKind kind = 1;
-	required string type = 2;
-	optional string label = 3;			// bc.name.label
+message BlockConnector{
+	required ConnectorKind connectorKind = 1;
+	required ConnectorType connectorType = 2;
+	optional string connectorLabel = 3;			// bc.name.label
 	optional bool labelEditable = 4 [default = false];
 	optional bool isExpandable = 6 [default = false];
-	optional Position position = 5 [default = single];
-	optional ConnectorArgDefault arg = 7;
+	optional ConnectorPosition connectorPosition = 5 [default = SINGLE];
+	optional ConnectorArgDefault connectorDefaultArg = 7;
 }
 
 enum ImageLocation{
-	center = 0;
-	east = 1;
-	west = 2;
-	north = 3;
-	south = 4;
-	southeast = 5;
-	southwest = 6;
-	northeast = 7;
-	northwest = 8;
+	CENTER = 0;
+	EAST = 1;
+	WEST = 2;
+	NORTH = 3;
+	SOUTH = 4;
+	SOUTHEAST = 5;
+	SOUTHWEST = 6;
+	NORTHEAST = 7;
+	NORTHWEST = 8;
 }
 
-message Image{
-	optional bool wrapText = 1 [default = false];
+message BlockImage{
+	optional bool imageWrapText = 1 [default = false];
 	optional bool imageEditable = 2 [default = false];
-	optional ImageLocation imageLocation = 3 [default = center];
-	optional int32 width = 4;
-	optional int32 height = 5;
+	optional ImageLocation imageLocation = 3 [default = CENTER];
+	optional int32 imageWidth = 4;
+	optional int32 imageHeight = 5;
 	required string fileLocation = 6;		// bi.name.image
 }
 
@@ -75,22 +90,22 @@ message BlockArg{
 }
 
 message Block{
-	required string name = 1;
-	optional BlockKind kind = 2 [default = command];
-	optional string color = 3 [default = "128 128 128"];
-	optional string label = 4 [default = ""];
-	optional BlockArg arg = 5;
-	optional Description description = 6;
-	repeated Connector connector = 7;
-	optional Image image = 8;
+	required string blockName = 1;
+	optional BlockKind blockKind = 2 [default = COMMAND];
+	optional string blockColor = 3 [default = "128 128 128"];
+	optional string blockLabel = 4 [default = ""];
+	optional BlockArg blockArg = 5;
+	optional BlockDescription blockDescription = 6;
+	repeated BlockConnector blockConnector = 7;
+	optional BlockImage blockImage = 8;
 }
 
 message Family{
 	required string refBlockName = 1;
-	repeated Block member= 2;
+	repeated Block familyMember= 2;
 }
 
 message Blocks{
 	repeated Block block= 1;
-	repeated family family= 2;
+	repeated Family family= 2;
 }

@@ -1,50 +1,49 @@
 syntax = "proto2";
 
-//package drawers;
-//protoc --java_out=./ setting.proto
+//	protoc --java_out=./ setting.proto
 
-option java_package = "edu.mit.blocks";
+option java_package = "edu.mit.custom";
 option java_outer_classname = "SettingProto"; 
 
 enum BlockDrawerType{
-	default=0;
-	factory=1;
-	page=2;
-	custom=3;
+	DEFAULT=0;
+	FACTORY=1;
+	PAGE=2;
+	CUSTOM=3;
+}
+
+enum DrawerSetType{
+	BAR = 0;
+	STACK = 1;
+}
+
+enum DrawerSetLocation{
+	EAST=0;
+	WEST=1;
+	NORTH=2;
+	SOUTH=3;
+	NORTHEAST=4;
+	SOUTHEAST=5;
+	SOUTHWEST=6;
+	NORTHWEST=7;
 }
 
 message BlockDrawer{
-	optional string drawerName = 1;			// depend on directory name
-	optional BlockDrawerType type = 2[ default = default ];
+	required string drawerName = 1;			// depend on directory name
+	optional BlockDrawerType type = 2[ default = DEFAULT ];
 	optional bool isOpen = 3 [default = false];
 	required string buttonColor = 4;
 	repeated string memberName = 5;
 }
 
-enum DrawerSetType{
-	bar = 0;
-	stack = 1;
-}
-
-enum DrawerSetLocation{
-	east=0;
-	west=1;
-	north=2;
-	south=3;
-	northeast=4;
-	southeast=5;
-	southwest=6;
-	northwest=7;
-}
-
 message BlockDrawerSet{
-	optional string name = 1 [default = "factory"];
-	optional DrawerSetType type = 2 [default = bar];
-	optional DrawerSetLocation location = 3 [default = west];
+	optional string drawerSetName = 1 [default = "factory"];
+	optional DrawerSetType drawerSetType = 2 [default = BAR];
+	optional DrawerSetLocation drawerSetLocation = 3 [default = WEST];
 	optional bool windowPerDrawer = 4 [default = true];
-	optional bool drawerdraggable = 5 [default = true];
-	optional int width = 6;
-	repeated BlockDrawer drawer= 7;
+	optional bool drawerDraggable = 5 [default = true];
+	optional int32 drawerSetWidth = 6;
+	repeated BlockDrawer blockDrawer= 7;
 }
 
 message PageDrawer{
@@ -52,11 +51,11 @@ message PageDrawer{
 }
 message Page{
 	required string pageName = 1;
-	required int pageWidth = 2;
+	required int32 pageWidth = 2;
 	optional string pageDrawer = 3;
 	optional string pageColor = 4;
 	optional string pageShape = 5;
-	optional PageDrawer pageDrawer= 6;
+	repeated PageDrawer drawer = 6;
 }
 
 message Pages{
@@ -64,7 +63,13 @@ message Pages{
 	repeated Page page = 2;
 }
 
-message setting{
-	required BlockDrawerSet drawerSet = 1;
-	required Pages page = 2;
+message TrashCan{
+	optional string openTrashCanImage =1;
+	optional string closeTrashCanImage =2;
+}
+
+message Setting{
+	repeated BlockDrawerSet blockDrawerSet = 1;
+	repeated Pages page = 2;
+	optional TrashCan trashCan = 3;
 }
