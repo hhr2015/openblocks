@@ -1418,15 +1418,15 @@ public final class BlocksProto {
         getDefaultArgNameBytes();
 
     /**
-     * <code>required string defaultArgLabel = 2;</code>
+     * <code>optional string defaultArgLabel = 2;</code>
      */
     boolean hasDefaultArgLabel();
     /**
-     * <code>required string defaultArgLabel = 2;</code>
+     * <code>optional string defaultArgLabel = 2;</code>
      */
     java.lang.String getDefaultArgLabel();
     /**
-     * <code>required string defaultArgLabel = 2;</code>
+     * <code>optional string defaultArgLabel = 2;</code>
      */
     com.google.protobuf.ByteString
         getDefaultArgLabelBytes();
@@ -1561,13 +1561,13 @@ public final class BlocksProto {
     public static final int DEFAULTARGLABEL_FIELD_NUMBER = 2;
     private volatile java.lang.Object defaultArgLabel_;
     /**
-     * <code>required string defaultArgLabel = 2;</code>
+     * <code>optional string defaultArgLabel = 2;</code>
      */
     public boolean hasDefaultArgLabel() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required string defaultArgLabel = 2;</code>
+     * <code>optional string defaultArgLabel = 2;</code>
      */
     public java.lang.String getDefaultArgLabel() {
       java.lang.Object ref = defaultArgLabel_;
@@ -1584,7 +1584,7 @@ public final class BlocksProto {
       }
     }
     /**
-     * <code>required string defaultArgLabel = 2;</code>
+     * <code>optional string defaultArgLabel = 2;</code>
      */
     public com.google.protobuf.ByteString
         getDefaultArgLabelBytes() {
@@ -1607,10 +1607,6 @@ public final class BlocksProto {
       if (isInitialized == 0) return false;
 
       if (!hasDefaultArgName()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasDefaultArgLabel()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -1911,9 +1907,6 @@ public final class BlocksProto {
         if (!hasDefaultArgName()) {
           return false;
         }
-        if (!hasDefaultArgLabel()) {
-          return false;
-        }
         return true;
       }
 
@@ -2014,13 +2007,13 @@ public final class BlocksProto {
 
       private java.lang.Object defaultArgLabel_ = "";
       /**
-       * <code>required string defaultArgLabel = 2;</code>
+       * <code>optional string defaultArgLabel = 2;</code>
        */
       public boolean hasDefaultArgLabel() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required string defaultArgLabel = 2;</code>
+       * <code>optional string defaultArgLabel = 2;</code>
        */
       public java.lang.String getDefaultArgLabel() {
         java.lang.Object ref = defaultArgLabel_;
@@ -2037,7 +2030,7 @@ public final class BlocksProto {
         }
       }
       /**
-       * <code>required string defaultArgLabel = 2;</code>
+       * <code>optional string defaultArgLabel = 2;</code>
        */
       public com.google.protobuf.ByteString
           getDefaultArgLabelBytes() {
@@ -2053,7 +2046,7 @@ public final class BlocksProto {
         }
       }
       /**
-       * <code>required string defaultArgLabel = 2;</code>
+       * <code>optional string defaultArgLabel = 2;</code>
        */
       public Builder setDefaultArgLabel(
           java.lang.String value) {
@@ -2066,7 +2059,7 @@ public final class BlocksProto {
         return this;
       }
       /**
-       * <code>required string defaultArgLabel = 2;</code>
+       * <code>optional string defaultArgLabel = 2;</code>
        */
       public Builder clearDefaultArgLabel() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -2075,7 +2068,7 @@ public final class BlocksProto {
         return this;
       }
       /**
-       * <code>required string defaultArgLabel = 2;</code>
+       * <code>optional string defaultArgLabel = 2;</code>
        */
       public Builder setDefaultArgLabelBytes(
           com.google.protobuf.ByteString value) {
@@ -9863,7 +9856,7 @@ public final class BlocksProto {
       "\n\014blocks.proto\";\n\020BlockDescription\022\017\n\004te" +
       "xt\030\001 \001(\t:\001 \022\026\n\016argDescription\030\002 \003(\t\"F\n\023C" +
       "onnectorArgDefault\022\026\n\016defaultArgName\030\001 \002" +
-      "(\t\022\027\n\017defaultArgLabel\030\002 \002(\t\"\233\002\n\016BlockCon" +
+      "(\t\022\027\n\017defaultArgLabel\030\002 \001(\t\"\233\002\n\016BlockCon" +
       "nector\022%\n\rconnectorKind\030\001 \002(\0162\016.Connecto" +
       "rKind\022%\n\rconnectorType\030\002 \002(\0162\016.Connector" +
       "Type\022\026\n\016connectorLabel\030\003 \001(\t\022\034\n\rlabelEdi" +

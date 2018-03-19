@@ -75,6 +75,17 @@ public class Utils {
 	private static final String PROTO_ROOT_PATH = "resources\\protos";
 	public final static String LANG_RESOURCES_PATH = "resources\\ardublock.properties";
 
+	private static final String PREFIX_BLOCK_COLOR = "bcolor.";
+	private static final String PREFIX_BLOCK_LABEL_INIT = "bg.";
+	private static final String SUFFIX_BLOCK_DESCRIPTION = ".description";
+	private static final String PREFIX_CONNECTOR_LABEL = "bc.";
+	private static final String PREFIX_BLOCK_IMAGE = "bi.";
+	private static final String PREFIX_BLOCK_DRAWER = "bd.";
+
+	private static final String DEFAULT_BLOCK_COLOR = "128 54 54";// "bcolor."
+	private static final String DEFAULT_BLOCK_KIND = "command";
+	private static final String DEFAULT_BLOCK_LABELINIT = EMPTY_STRING;// "unknow";
+
 	private static ResourceBundle bundle = null;
 
 	static {
@@ -105,6 +116,18 @@ public class Utils {
 			}
 		}
 		return bundle;
+	}
+
+	private static String getStringFromBundle(String temp, String msg) {
+		String str = null;
+		if(temp != null){
+			try {
+				str = bundle.getString(temp);
+			} catch (Exception e) {
+				System.out.println(msg);
+			}
+		}
+		return str;
 	}
 
 	public static void loadBlockLanguage(Workspace workspace) {
@@ -226,15 +249,16 @@ public class Utils {
 			newGenus.setKind(BlockGenusKind[member.getBlockKind().getNumber()]);
 		}
 		// set init label
-		String labelString = null;
+		String labelString = PREFIX_BLOCK_LABEL_INIT+member.getBlockName();
 		if (member.hasBlockLabel()) {
 			labelString = member.getBlockLabel();
-			if (labelString.startsWith(PREFIX_BLOCK_LABEL_INIT)) {
-				String tmpString = bundle.getString(labelString);
-				labelString = (tmpString == null) ? labelString : tmpString;
-				if (tmpString == null) {
-					System.out.println("can't find:" + labelString);
-				}
+		}
+		if (labelString.startsWith(PREFIX_BLOCK_LABEL_INIT)) {
+			String tmpString = getStringFromBundle(labelString,
+					"ERROR:(" + newGenus.getGenusName() + "):can't find init label definition");
+			labelString = (tmpString == null) ? labelString : tmpString;
+			if (tmpString == null) {
+				System.out.println("can't find:" + labelString);
 			}
 		}
 		if (labelString != null) {
@@ -275,14 +299,14 @@ public class Utils {
 			if (directory.isDirectory()) {
 				List<Blocks> list = new ArrayList<BlocksProto.Blocks>();
 				for (File proto : directory.listFiles()) {
-					// System.out.println("proto:" + proto.getAbsolutePath() +
-					// ":" + proto.getName());
+					//System.out.println("proto:" + proto.getAbsolutePath() + ":" + proto.getName());
 					list.add(readBlocksFromFile(proto));
 				}
 				blocksMap.put(directory.getName(), list);
 			}
 		}
 		// System.out.println(blocksMap.toString());
+		// System.out.println(blocksMap.size());
 		return blocksMap;
 	}
 
@@ -315,21 +339,11 @@ public class Utils {
 		}
 	}
 
-	private static final String PREFIX_BLOCK_COLOR = "bcolor.";
-	private static final String PREFIX_BLOCK_LABEL_INIT = "bg.";
-	private static final String SUFFIX_BLOCK_DESCRIPTION = ".description";
-	private static final String PREFIX_CONNECTOR_LABEL = "bc.";
-	private static final String PREFIX_BLOCK_IMAGE = "bi.";
-	private static final String PREFIX_BLOCK_DRAWER = "bd.";
-
-	private static final String DEFAULT_BLOCK_COLOR = "128 54 54";// "bcolor."
-	private static final String DEFAULT_BLOCK_KIND = "command";
-	private static final String DEFAULT_BLOCK_LABELINIT = EMPTY_STRING;// "unknow";
-
 	private static void loadArg(Workspace workspace, BlocksProto.Block block, BlockGenus newGenus) {
 		// set color
 		String colorString = block.hasBlockColor() ? block.getBlockColor() : DEFAULT_BLOCK_COLOR;
-		String temp = colorString.startsWith(PREFIX_BLOCK_COLOR) ? bundle.getString(colorString) : null;
+		String temp = colorString.startsWith(PREFIX_BLOCK_COLOR) ? getStringFromBundle(colorString,
+				"ERROR:(" + newGenus.getGenusName() + "):can't find color definition") : null;
 		colorString = (temp == null) ? colorString : temp;
 		StringTokenizer color = new StringTokenizer(colorString);
 		if (color.countTokens() != 3) {
@@ -345,18 +359,9 @@ public class Utils {
 			newGenus.setKind(DEFAULT_BLOCK_KIND);
 		}
 		// set init label
-		String labelString = null;
-		if (block.hasBlockLabel()) {
-			labelString = block.getBlockLabel();
-			if (labelString.startsWith(PREFIX_BLOCK_LABEL_INIT)) {
-				String tmpString = bundle.getString(labelString);
-				labelString = (tmpString == null) ? labelString : tmpString;
-			}
-		}
-		if (labelString == null) {
-			labelString = DEFAULT_BLOCK_LABELINIT;
-			System.out.println(newGenus.getGenusName() + ":need init label definition");
-		}
+		String s = PREFIX_BLOCK_LABEL_INIT + newGenus.getGenusName();
+		String labelString = getStringFromBundle(s,
+				"ERROR:(" + newGenus.getGenusName() + "):can't find init label definition");
 		newGenus.setInitLabel(labelString);
 	}
 
@@ -382,7 +387,8 @@ public class Utils {
 		if (block.hasBlockDescription()) {
 
 			String desc = block.getBlockDescription().hasText() ? block.getBlockDescription().getText() : " ";
-			String temp = bundle.getString(PREFIX_BLOCK_LABEL_INIT + block.getBlockName() + SUFFIX_BLOCK_DESCRIPTION);
+			String temp = getStringFromBundle(PREFIX_BLOCK_LABEL_INIT + block.getBlockName() + SUFFIX_BLOCK_DESCRIPTION,
+					"ERROR:(" + newGenus.getGenusName() + "):can't find block description definition");
 			newGenus.setBlockDescription(temp == null ? desc : temp);
 
 			for (String argDescription : block.getBlockDescription().getArgDescriptionList()) {
@@ -396,8 +402,9 @@ public class Utils {
 
 			newGenus.setHasDefArgs(newGenus.isHasDefArgs() == false ? conn.hasConnectorDefaultArg() : true);
 
-			String connLabel = conn.hasConnectorLabel() ? conn.getConnectorLabel() : " ";
-			String temp = connLabel.startsWith(PREFIX_CONNECTOR_LABEL) ? bundle.getString(connLabel) : connLabel;
+			String connLabel = conn.hasConnectorLabel() ? conn.getConnectorLabel() : "";
+			String temp = connLabel.startsWith(PREFIX_CONNECTOR_LABEL) ? getStringFromBundle(connLabel,
+					"ERROR:(" + newGenus.getGenusName() + "):can't find connector label definition") : null;
 			connLabel = temp == null ? connLabel : temp;
 
 			int position = conn.hasConnectorPosition() ? conn.getConnectorPosition().getNumber() : 0;
@@ -409,9 +416,15 @@ public class Utils {
 					editable, expandable, null, Block.NULL);
 			// set default arg
 			if (conn.hasConnectorDefaultArg() && conn.getConnectorDefaultArg().hasDefaultArgName()) {
-				String arglabel = conn.getConnectorDefaultArg().hasDefaultArgLabel()
-						? conn.getConnectorDefaultArg().getDefaultArgLabel() : null;
-				socket.setDefaultArgument(conn.getConnectorDefaultArg().getDefaultArgName(), arglabel);
+				ConnectorArgDefault arg = conn.getConnectorDefaultArg();
+				String arglabel = null;
+				if (arg.hasDefaultArgLabel()) {
+					arglabel = arg.getDefaultArgLabel();
+				} else {
+					arglabel = getStringFromBundle(PREFIX_BLOCK_LABEL_INIT + arg.getDefaultArgName(), "ERROR:("
+							+ newGenus.getGenusName() + "):can't find connector default arg label definition");
+				}
+				socket.setDefaultArgument(arg.getDefaultArgName(), arglabel);
 			}
 
 			if (conn.getConnectorKind() == ConnectorKind.SOCKET) {
@@ -440,7 +453,7 @@ public class Utils {
 					+ newGenus.getGenusName();
 
 			String temp = block.getBlockImage().getFileLocation();
-			String fileLocation = temp.startsWith(PREFIX_BLOCK_IMAGE) ? (bundle.getString(temp)) : temp;
+			String fileLocation = temp.startsWith(PREFIX_BLOCK_IMAGE) ? getStringFromBundle(temp, "ERROR:(" + newGenus.getGenusName() + "):can't find block image definition:"+temp) : temp;
 
 			File file = new File(fileLocation);
 			assert file.exists() : "image not found(" + newGenus.getGenusName() + "):" + fileLocation;
@@ -608,7 +621,6 @@ public class Utils {
 		}
 	}
 
-	
 	/* ODO ************************************************************************************************/
 
 	public static void loadProjectFromPath(Workspace workspace, String saveFilePath) {
@@ -646,11 +658,13 @@ public class Utils {
 			for (BlockDrawer drawer : drawerSet.getBlockDrawerList()) {
 				// get name
 				String drawerName = drawer.getDrawerName();
-				String tempName = drawerName.startsWith(PREFIX_BLOCK_DRAWER) ? bundle.getString(drawerName) : null;
+				String tempName = drawerName.startsWith(PREFIX_BLOCK_DRAWER) ? getStringFromBundle(drawerName, "ERROR:("
+						+ drawer + "):can't find drawer name definition") : null;
 				drawerName = (tempName == null) ? drawerName : tempName;
 				// get color
 				String colorString = drawer.hasButtonColor() ? drawer.getButtonColor() : DEFAULT_BLOCK_COLOR;
-				String tempcolor = colorString.startsWith(PREFIX_BLOCK_COLOR) ? bundle.getString(colorString) : null;
+				String tempcolor = colorString.startsWith(PREFIX_BLOCK_COLOR) ? getStringFromBundle(colorString, "ERROR:("
+						+ drawer + "):can't find drawer color definition") : null;
 				colorString = (tempcolor == null) ? colorString : tempcolor;
 				StringTokenizer color = new StringTokenizer(colorString);
 				if (color.countTokens() != 3) {
@@ -664,7 +678,12 @@ public class Utils {
 				ArrayList<RenderableBlock> drawerRBs = new ArrayList<RenderableBlock>();
 				for (String member : drawer.getMemberNameList()) {
 					assert workspace.getEnv().getGenusWithName(member) != null : "Unknown BlockGenus: " + member;
-					Block newBlock = new Block(workspace, member, false);
+					Block newBlock = null;
+					try {
+						newBlock = new Block(workspace, member, false);
+					} catch (Exception e) {
+						System.out.println("error while loading drawerSet from proto:" + member);
+					}
 					drawerRBs.add(new FactoryRenderableBlock(workspace, manager, newBlock.getBlockID()));
 				}
 				manager.addStaticBlocks(drawerRBs, drawerName);
@@ -751,7 +770,8 @@ public class Utils {
 		String pageDrawer = page.hasPageDrawer() ? page.getPageDrawer() : null;
 
 		String color = page.hasPageColor() ? page.getPageColor() : DEFAULT_BLOCK_COLOR;
-		String tempStr = color.startsWith(PREFIX_BLOCK_COLOR) ? bundle.getString(color) : null;
+		String tempStr = color.startsWith(PREFIX_BLOCK_COLOR) ? getStringFromBundle(color, "ERROR:("
+				+ pageName + "):can't find page color definition") : null;
 		color = (tempStr == null) ? color : tempStr;
 
 		StringTokenizer col = new StringTokenizer(color);

@@ -415,10 +415,10 @@ public class WorkspaceController {
         }
         if (langDefDirty) {
             //loadBlockLanguage(langDefRoot);					// importment
-        	Utils.loadBlockLanguage(workspace);// TODO 
             langDefDirty = false;
         }
-        
+
+    	Utils.loadBlockLanguage(workspace);// TODO 
         //loadProjectFromElement(null, langDefRoot);		// importment        
         Utils.loadSetting(this,null);
     }

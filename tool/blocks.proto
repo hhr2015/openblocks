@@ -45,7 +45,7 @@ enum ConnectorPosition{
 }
 message ConnectorArgDefault{
 	required string defaultArgName = 1;
-	required string defaultArgLabel = 2;
+	optional string defaultArgLabel = 2;
 }
 message BlockConnector{
 	required ConnectorKind connectorKind = 1;
